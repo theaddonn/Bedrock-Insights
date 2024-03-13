@@ -6,4 +6,4 @@ This is a MonoRepo containing Amethyst mods for Minecraft Bedrock Edition
 
 #### Contents:
 - AdvancedF3
-- BlockNav
+- BedrockAtlas

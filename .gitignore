@@ -5,9 +5,9 @@ build/
 cmake-build-relwithdebinfo-visual-studio/
 CMakeFiles/
 
-BlockNav/build/
-BlockNav/cmake-build-relwithdebinfo-visual-studio/
-BlockNav/CMakeFiles/
+BedrockAtlas/build/
+BedrockAtlas/cmake-build-relwithdebinfo-visual-studio/
+BedrockAtlas/CMakeFiles/
 
 AdvancedF3/build/
 AdvancedF3/cmake-build-relwithdebinfo-visual-studio/

@@ -4,7 +4,6 @@
 
 #include "minimapRenderer.h"
 #include "../color/ColorHandler.h"
-#include "../heightmap/HeightMapCalc.h"
 #include <minecraft/src-client/common/client/renderer/helpers/MeshHelpers.h>
 #include <minecraft/src/common/world/level/BlockPos.h>
 #include <minecraft/src/common/world/level/block/Block.h>
@@ -40,16 +39,6 @@ void Minimap::Render(ScreenView* screenView, MinecraftUIRenderContext* renderCon
         this->hasInitializedMinimap = true;
     }
 
-    frame_c++;
-    if (frame_c == 1000) {
-        for (int x = -1000; x < 1000; ++x) {
-            for (int z = -1000; z < 1000; ++z) {
-                mce::Color color = ColorHandler::getColor(region, x, z, this->mUseTranslucency);
-                this->mColorData[x][z] = color;
-            }
-        }
-    }
-
     int minimapScreenSize = 135;
     int offset = 5;
 
@@ -73,14 +62,14 @@ void Minimap::Render(ScreenView* screenView, MinecraftUIRenderContext* renderCon
     tessellator->begin(mce::TriangleList, width_in_blocks * width_in_blocks);
     tessellator->mNoColor = false;
 
-    mce::Color color(0, 0, 0, 1);
+    this->loadedBlocksSinceLastFrame = 0;
 
     for (int local_x = 0; local_x < width_in_blocks; ++local_x) {
         for (int local_z = 0; local_z < width_in_blocks; ++local_z) {
             float pixel_left = left + (float)local_x * pixels_per_block;
             float pixel_bottom = bottom - (float)local_z * pixels_per_block;
 
-            color = this->mColorData[map_min_x + local_x][map_min_z + local_z];
+            mce::Color color = this->getColorAt(map_min_x + local_x, map_min_z + local_z);
 
             tessellator->color(color.r, color.g, color.b, color.a);
 
@@ -92,8 +81,6 @@ void Minimap::Render(ScreenView* screenView, MinecraftUIRenderContext* renderCon
             }
         }
     }
-
-    Log::Info("#{:x}{:x}{:x}", (int) (color.r*255), (int) (color.g*255), (int) (color.b*255));
 
     // Get material
     //HashedString hashedMaterialName("entity_static");
@@ -109,7 +96,41 @@ void Minimap::Render(ScreenView* screenView, MinecraftUIRenderContext* renderCon
 
 void Minimap::onBlockChanged(BlockSource& source, const BlockPos& pos, uint32_t layer, const Block& block, const Block& oldBlock, int updateFlags, const ActorBlockSyncMessage* syncMsg, BlockChangedEventTarget eventTarget, Actor* blockChangeSource)
 {
-    //mce::Color color = ColorHandler::getColor(&source, pos.x, pos.z, this->mUseTranslucency);
-    //Log::Info("X: {}, Y: {}, Z: {} | #{:x}{:x}{:x}", pos.x, pos.y, pos.z, (int) (color.r*255), (int) (color.g*255), (int) (color.b*255));
-    //this->mColorData[pos.x][pos.z] = color;
+    this->loadedBlocksSinceLastFrame++;
+    if (this->hasInitializedMinimap) {
+        mce::Color color = ColorHandler::getColor(&source, pos.x, pos.z, this->mUseTranslucency);
+        this->mColorData[pos.x][pos.z] = color;
+    }
+}
+
+mce::Color Minimap::getColorAt(int x, int z)
+{
+    auto data_x_list = this->mColorData.find(x);
+
+    if (data_x_list != this->mColorData.end()) {
+        auto data_z_list = data_x_list->second.find(z);
+
+        if (data_z_list != data_x_list->second.end()) {
+            return data_z_list->second;
+        } else {
+            return this->genColorAt(x, z);
+        }
+    } else {
+        return this->genColorAt(x, z);
+    }
+}
+
+mce::Color Minimap::genColorAt(int x, int z)
+{
+    this->loadedBlocksSinceLastFrame++;
+
+    if (this->loadedBlocksSinceLastFrame < this->mBlocksLoadPerFrame)
+    {
+        mce::Color color = ColorHandler::getColor(this->region, x, z, this->mUseTranslucency);
+        this->mColorData[x][z] = color;
+        return color;
+    }
+    else {
+        return {0, 0, 0, 1};
+    }
 }

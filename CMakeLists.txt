@@ -10,8 +10,8 @@ set(CMAKE_CXX_STANDARD 23)
 # Add AdvancedF3 subfolder as a subdirectory
 add_subdirectory(AdvancedF3)
 
-# Add BlockNav subfolder as a subdirectory
-add_subdirectory(BlockNav)
+# Add BedrockAtlas subfolder as a subdirectory
+add_subdirectory(BedrockAtlas)
 
 # Code Style
 add_custom_target(ClangFormat

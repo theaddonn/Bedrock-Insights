@@ -23,18 +23,24 @@ private:
 
     BlockSource* region = nullptr;
     bool hasInitializedMinimap = false;
+    int loadedBlocksSinceLastFrame = 0;
 
 public:
     /*
     The number of chunks to render on the map
     */
-    int mRenderDistance = 6;
+    int mRenderDistance = 9;
 
     /*
     The number of chunks extra that should be loaded around the current render distance
     Prevents black zones around the edges of the map, but takes extra performance
     */
     int mRenderSafeZone = 1;
+
+    /*
+    The number of blocks to get loaded per frame
+    */
+    int mBlocksLoadPerFrame = 10000;
 
     /*
     Should the transparency of blocks be considered?
@@ -47,8 +53,9 @@ public:
     void Render(ScreenView* screenView, MinecraftUIRenderContext* ctx);
 
 private:
-    void AddChunksInRenderDistance(ClientInstance* client);
-    void MapChunk(ChunkPos chunkPos, BlockSource* region);
+    mce::Color getColorAt(int x, int z);
+    mce::Color genColorAt(int x, int z);
 
     virtual void onBlockChanged(BlockSource& source, const BlockPos& pos, uint32_t layer, const Block& block, const Block& oldBlock, int updateFlags, const ActorBlockSyncMessage* syncMsg, BlockChangedEventTarget eventTarget, Actor* blockChangeSource) override;
+
 };
