@@ -8,7 +8,7 @@ Most/All of these Mods were made by Adrian8115.
 
 #### Mods:
 - [AdvancedF3](https://github.com/Adrian8115/AdvancedF3)
-- [BedrockAtlas](https://github.com/Adrian8115/BedrockAtlas)
+- [Atlas](https://github.com/AmethystAPI/Atlas)
 
 #### Tests/Examples:
 - [Amethyst UDP](https://github.com/Adrian8115/amethyst-udp-test)
